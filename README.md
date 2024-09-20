@@ -1,2 +1,2 @@
 # WEB-Repeater-Power-control
-This is Python Flask server for control PIO(relay) based on Raspberry Pi and two relay. 
+This is Python Flask server for control PIO(relay) based on Raspberry Pi and two relay. With relay we control power supply or signal TX inhibit on repeater. Control is possible with two mode, timer and manual. In Timer mode after click on button, relay is activ for time in Time field on web, after that time, relay is inactiv. In Manual mode every clic on button toggle relay. Manual mode is aktiv if Time is set to 0.
