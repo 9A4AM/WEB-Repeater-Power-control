@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB REPEATER CONTROL by 9A4AM</title>
+    <style>
+        body {
+            background-color: #4169E1; /*  background */
+            color: white; /*  text */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        label, button, input {
+            font-size: 1.2em;
+        }
+        button {
+            margin: 10px;
+            padding: 10px;
+            background-color: green; /* green*/
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: red; /* red*/
+        }
+    </style>
+ <script>
+    // Function to toggle relay with timer
+    function toggleRelayWithTimer(relay, state) {
+        // Get the delay time for the relay
+        let delay = document.getElementById(`relay${relay}_timer`).value;
+        delay = parseInt(delay) * 1000; // Convert to milliseconds
+
+        // If the delay is 0, treat it as a simple toggle
+        if (delay === 0) {
+            // Toggle relay without any delay
+            toggleRelay(relay, state === 0 ? 1 : 0);
+        } else {
+            // Handle relay with timer
+            fetch(`/toggle_relay/${relay}/${state}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateStatus();
+
+                    if (state === 0) {
+                        // Set a timer to turn the relay back on
+                        setTimeout(() => {
+                            toggleRelay(relay, 1); // Turn relay back on after delay
+                        }, delay);
+                    }
+                }
+            });
+        }
+    }
+
+    // Function to toggle relay without timer
+    function toggleRelay(relay, state) {
+        fetch(`/toggle_relay/${relay}/${state}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateStatus();
+            }
+        });
+    }
+
+    // Function to get the status of relays
+    function updateStatus() {
+        fetch('/get_status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('relay1_status').innerText = data.relay1 ? 'On' : 'Off';
+            document.getElementById('relay2_status').innerText = data.relay2 ? 'On' : 'Off';
+        });
+    }
+
+    // Automatically update the relay status on page load
+    window.onload = function() {
+        updateStatus();
+    };
+</script>
+
+</head>
+<body>
+    <h1>WEB Repeater power control by 9A4AM</h1>
+	<br>
+     <label style="font-style: italic; color: yellow;">
+    (VHF[FM - 9A0VMB] & UHF[DMR - 9A0DKT] --> JN85IM)
+    </label>
+	<br>
+	<label style="font-style: italic; color: yellow;">
+    (VHF[145.6875MHz -0.6MHz] & UHF[439.250MHz -7.6MHz] --> Mramor Brdo 249m ASL)
+    </label>
+	<br>
+	<label style="font-style: italic; color: yellow;">
+    Radioklub KUTINA "9A1FAB"
+    </label>
+	<br><br>
+    <!-- Relay 1 Controls -->
+    <button onclick="toggleRelayWithTimer(1, 0)">UHF Repeater control</button>
+    <label id="relay1_status">On</label>
+    <br>
+    <label for="relay1_timer">UHF Off Time (seconds):</label>
+    <input type="number" id="relay1_timer" value="10">
+    <br><br>
+
+    <!-- Relay 2 Controls -->
+    <button onclick="toggleRelayWithTimer(2, 0)">VHF Repeater control</button>
+    <label id="relay2_status">On</label>
+    <br>
+    <label for="relay2_timer">VHF Off Time (seconds):</label>
+    <input type="number" id="relay2_timer" value="10">
+    <br><br>
+    <!-- Toggle mode explanation -->
+    <label style="font-style: italic; color: red;">
+    If time set to 0, then control manual (toggle mode).
+    </label>
+</body>
+</html>
